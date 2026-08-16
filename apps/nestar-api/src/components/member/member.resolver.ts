@@ -8,7 +8,7 @@ import { Member } from '../../libs/types/dto/member/member';
 export class MemberResolver {
     constructor (private readonly memberService: MemberService) {}
 
-    @Mutation(() => String)
+    @Mutation(() => Member)
     @UsePipes(ValidationPipe)
     public async signup(@Args("input")input: MemberInput): Promise<Member> {
         try {
@@ -25,11 +25,11 @@ export class MemberResolver {
 
     @Mutation(() => String)
     @UsePipes(ValidationPipe)
-    public async login(@Args("input")input: LoginInput): Promise<string> {
+    public async login(@Args("input")input: LoginInput): Promise<Member> {
         try {
         console.log("Mutation login");
         console.log("input", input);
-        return this.memberService.login();
+        return this.memberService.login(input);
         } catch(err) {
         console.log("Error, signup:", err);
         throw new InternalServerErrorException(err);
