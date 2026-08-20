@@ -3,6 +3,10 @@ import { MemberService } from './member.service';
 import { InternalServerErrorException, UsePipes, ValidationPipe } from '@nestjs/common';
 import { LoginInput, MemberInput } from '../../libs/types/dto/member/member.input';
 import { Member } from '../../libs/types/dto/member/member';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '../auth/auth/guards/auth.guard';
+import { AuthMember } from '../auth/auth/decorators/authMember.decorator';
+import { ObjectId } from 'bson';
 
 @Resolver()
 export class MemberResolver {
@@ -23,11 +27,19 @@ export class MemberResolver {
     }
 
 
-    // Authenticated
+    @UseGuards(AuthGuard)
     @Mutation(() => String)
-    public async updateMember(): Promise<string> {
+    public async updateMember(@AuthMember('_id') memberId: ObjectId): Promise<string> {
         console.log("Mutation updateMember");
         return this.memberService.updateMember();
+    }
+
+    @UseGuards(AuthGuard)
+    @Query(() => String)
+    public async checkAuth(@AuthMember('memberNick') memberNick: string): Promise<string> {
+        console.log('Query: checkAuth');
+        console.log('memberNick:', memberNick);
+        return `Hi ${memberNick}`;
     }
 
     @Query(() => String)
