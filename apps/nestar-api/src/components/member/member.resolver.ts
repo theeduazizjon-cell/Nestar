@@ -18,6 +18,8 @@ import { WithoutGuard } from '../auth/auth/guards/without.guard';
 export class MemberResolver {
     constructor (private readonly memberService: MemberService) {}
 
+    // CALLING APIS
+
     @Mutation(() => Member)
     @UsePipes(ValidationPipe)
     public async signup(@Args("input")input: MemberInput): Promise<Member> {
@@ -25,13 +27,16 @@ export class MemberResolver {
         return await this.memberService.signup(input);
     }
 
+    // CALL 
     @Mutation(() => String)
     @UsePipes(ValidationPipe)
     public async login(@Args("input")input: LoginInput): Promise<Member> {
         console.log("Mutation login");
         return await this.memberService.login(input);
-    }
-
+    } 
+    
+    // AUTHENTICATION 
+    // CALL 
     @UseGuards(AuthGuard)
     @Query(() => String)
     public async checkAuth(@AuthMember('memberNick') memberNick: string): Promise<string> {
@@ -40,6 +45,8 @@ export class MemberResolver {
         return `Hi ${memberNick}`;
     }
 
+    // AUTHORIZATION = AUTHENTICATION + PERMISSION 
+    // CALL
     @Roles(MemberType.USER, MemberType.AGENT)
     @UseGuards(RolesGuard)
     @Query(() => String)
@@ -48,6 +55,7 @@ export class MemberResolver {
         return `Hi ${authMember.memberNick}, you are ${authMember.memberType} (memberId: ${authMember._id})`;
     }
 
+    // CALL 
     @UseGuards(AuthGuard)
     @Mutation(() => Member)
     public async updateMember(
@@ -59,6 +67,7 @@ export class MemberResolver {
         return await this.memberService.updateMember(memberId, input);
     }
 
+    // CAll
     @UseGuards(WithoutGuard)
     @Query(() => Member)
     public async getMember(
@@ -70,6 +79,9 @@ export class MemberResolver {
         return await this.memberService.getMember(memberId, targetId);
     }
 
+
+    // RETRIEVER
+    // CALL
     @UseGuards(WithoutGuard)
     @Query(() => Members)
     public async getAgents(
@@ -81,7 +93,7 @@ export class MemberResolver {
     }
 
     /** ADMIN **/
-
+    // CALL
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
     @Query(() => Members)
@@ -90,6 +102,7 @@ export class MemberResolver {
         return await this.memberService.getAllMembersByAdmin(input);
     }
 
+    // CALL 
     @Roles(MemberType.ADMIN)
     @UseGuards(RolesGuard)
     @Mutation(() => Member)

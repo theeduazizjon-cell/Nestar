@@ -13,6 +13,9 @@ import { ViewService } from '../view/view.service';
 import { ViewGroup } from '../../libs/types/enums/view.enum';
 import { Direction } from '../../libs/types/enums/common.enum';
 
+// DEFINING APIS 
+
+
 @Injectable()
 export class MemberService {
     constructor(@InjectModel("Member") private readonly memberModel: Model<Member>,
@@ -20,6 +23,7 @@ export class MemberService {
     private viewService: ViewService,
 ) {}
 
+    // DEFINE 
     public async signup(input: MemberInput): Promise<Member> {
         // Password hashing |
         input.memberPassword = await this.authService.hashPassword(input.memberPassword);
@@ -34,6 +38,7 @@ export class MemberService {
         }
     }
 
+    // DEFINE
     public async login(input: LoginInput): Promise<Member> {
         const {memberNick, memberPassword} = input;
         const response: Member = await this.memberModel
@@ -55,6 +60,7 @@ export class MemberService {
         return response; 
     }
 
+    // DEFINE 
     public async updateMember(memberId: ObjectId, input: MemberUpdate): Promise<Member> {
         const result: Member | null = await this.memberModel
             .findOneAndUpdate(
@@ -72,6 +78,7 @@ export class MemberService {
         return result;
     }
 
+    // DEFINE 
     public async getMember(memberId: ObjectId, targetId: ObjectId): Promise<Member> {
         const search: T = {
             _id: targetId,
@@ -97,6 +104,7 @@ export class MemberService {
         return targetMember;
     }
 
+    // DEFINE 
     public async getAgents(memberId: ObjectId, input: AgentsInquiry): Promise<Members> {
         const { text } = input.search ?? {};
         const match: T = { memberType: MemberType.AGENT, memberStatus: MemberStatus.ACTIVE };
@@ -122,6 +130,7 @@ export class MemberService {
         return result[0];
     }
 
+    // DEFINE 
     public async getAllMembersByAdmin(input: MembersInquiry): Promise<Members> {
         const { memberStatus, memberType, text } = input.search ?? {};
         const match: T = {};
@@ -149,6 +158,7 @@ export class MemberService {
         return result[0];
     }
 
+    // DEFINE 
     public async updateMemberByAdmin(input: MemberUpdate): Promise<Member> {
         const result: Member | null = await this.memberModel
             .findOneAndUpdate({ _id: input._id }, input, { new: true })
