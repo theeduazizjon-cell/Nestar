@@ -33,7 +33,7 @@ export class MemberService {
         const accessToken = await this.authService.createToken(result);
         return result;
         }catch(err){
-            console.log("Error, Service.model:", err.message);
+            console.log("Error, Service.model:", err instanceof Error ? err.message : err);
             throw new BadRequestException(Message.USED_MEMBER_NICK_OR_PHONE);
         }
     }
