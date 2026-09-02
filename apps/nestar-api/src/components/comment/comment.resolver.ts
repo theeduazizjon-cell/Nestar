@@ -9,6 +9,9 @@ import { Comment, Comments } from '../../libs/types/dto/comment/comment';
 import { AuthMember } from '../auth/auth/decorators/authMember.decorator';
 import { AuthGuard } from '../auth/auth/guards/auth.guard';
 import { WithoutGuard } from '../auth/auth/guards/without.guard';
+import { Roles } from '../auth/auth/decorators/roles.decorator';
+import { MemberType } from '../../libs/types/enums/member.enum';
+import { RolesGuard } from '../auth/auth/guards/roles.guard';
 
 @Resolver()
 export class CommentResolver {
@@ -45,5 +48,15 @@ export class CommentResolver {
 		input.search.commentRefId = shapeIntoMongoObjectId(input.search.commentRefId);
 		const result = await this.commentService.getComments(memberId, input);
 		return result;
+	}
+
+	/** ADMIN **/
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => Comment)
+	public async removeCommentByAdmin(@Args('commentId') input: string): Promise<Comment> {
+		console.log('Mutation: removeCommentByAdmin');
+		const commentId = shapeIntoMongoObjectId(input);
+		return await this.commentService.removeCommentByAdmin(commentId);
 	}
 }
