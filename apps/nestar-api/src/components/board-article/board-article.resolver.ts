@@ -1,14 +1,21 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Query, Mutation, Resolver } from '@nestjs/graphql';
+import { BoardArticleService } from './board-article.service';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth/guards/auth.guard';
-import { AuthMember } from '../auth/auth/decorators/authMember.decorator';
-import { WithoutGuard } from '../auth/auth/guards/without.guard';
-import { BoardArticleService } from './board-article.service';
-import { BoardArticleUpdate } from '../../libs/types/dto/board-article/board-article.update';
-import { BoardArticleInput, BoardArticlesInquiry } from '../../libs/types/dto/board-article/board-article.input';
 import { BoardArticle, BoardArticles } from '../../libs/types/dto/board-article/board-article';
-import { shapeIntoMongoObjectId } from '../../libs/types/config';
+import { AuthMember } from '../auth/auth/decorators/authMember.decorator';
+import {
+	AllBoardArticlesInquiry,
+	BoardArticleInput,
+	BoardArticlesInquiry,
+} from '../../libs/types/dto/board-article/board-article.input';
 import type { ObjectId } from 'mongoose';
+import { shapeIntoMongoObjectId } from '../../libs/types/config';
+import { WithoutGuard } from '../auth/auth/guards/without.guard';
+import { BoardArticleUpdate } from '../../libs/types/dto/board-article/board-article.update';
+import { Roles } from '../auth/auth/decorators/roles.decorator';
+import { MemberType } from '../../libs/types/enums/member.enum';
+import { RolesGuard } from '../auth/auth/guards/roles.guard';
 
 @Resolver()
 export class BoardArticleResolver {
@@ -20,14 +27,14 @@ export class BoardArticleResolver {
 		@Args('input') input: BoardArticleInput,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<BoardArticle> {
-		console.log('Mutation: createBoardArticle');
+		console.log('Muatation: createBoardArticle');
 		return await this.boardArticleService.createBoardArticle(memberId, input);
 	}
 
 	@UseGuards(WithoutGuard)
 	@Query((returns) => BoardArticle)
 	public async getBoardArticle(
-		@Args('articleId') input: string,
+		@Args('input') input: string,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<BoardArticle> {
 		console.log('Query: getBoardArticle');
@@ -41,7 +48,7 @@ export class BoardArticleResolver {
 		@Args('input') input: BoardArticleUpdate,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<BoardArticle> {
-		console.log('Mutation: updateBoardArticle');
+		console.log('Muatation: updateBoardArticle');
 		input._id = shapeIntoMongoObjectId(input._id);
 		return await this.boardArticleService.updateBoardArticle(memberId, input);
 	}
@@ -54,5 +61,41 @@ export class BoardArticleResolver {
 	): Promise<BoardArticles> {
 		console.log('Query: getBoardArticles');
 		return await this.boardArticleService.getBoardArticles(memberId, input);
+	}
+
+	/** ADMIN */
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Query((returns) => BoardArticles)
+	public async getAllBoardArticlesByAdmin(
+		@Args('input') input: AllBoardArticlesInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<BoardArticles> {
+		console.log('Query: getAllBoardArticlesByAdmin');
+		return await this.boardArticleService.getAllBoardArticlesByAdmin(input);
+	}
+
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation(() => BoardArticle)
+	public async updateBoardArticleByAdmin(
+		@Args('input') input: BoardArticleUpdate,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<BoardArticle> {
+		console.log('Mutation: updateBoardArticleByAdmin');
+		input._id = shapeIntoMongoObjectId(input._id);
+		return await this.boardArticleService.updateBoardArticleByAdmin(input);
+	}
+
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => BoardArticle)
+	public async removeBoardArticleByAdmin(
+		@Args('input') input: string,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<BoardArticle> {
+		console.log('Mutation: removeBoardArticlesByAdmin');
+		const articleId = shapeIntoMongoObjectId(input);
+		return await this.boardArticleService.removeBoardArticlesByAdmin(articleId);
 	}
 }
