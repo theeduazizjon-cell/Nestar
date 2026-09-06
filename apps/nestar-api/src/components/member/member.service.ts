@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AgentsInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/types/dto/member/member.input';
 import { Member, Members } from '../../libs/types/dto/member/member';
+import { Follower, Following, MeFollowed } from '../../libs/types/dto/follow/follow';
 import { MemberStatus, MemberType } from '../../libs/types/enums/member.enum';
 import { Message } from '../../libs/types/enums/common.enum';
 import { AuthService } from '../auth/auth/auth.service';
@@ -22,6 +23,7 @@ import { LikeService } from '../like/like.service';
 @Injectable()
 export class MemberService {
     constructor(@InjectModel("Member") private readonly memberModel: Model<Member>,
+    @InjectModel('Follow') private readonly followModel: Model<Follower | Following>,
     private authService: AuthService,
     private viewService: ViewService,
     private likeService: LikeService,
@@ -105,9 +107,15 @@ export class MemberService {
             const likeInput = { memberId: memberId, likeRefId: targetId, likeGroup: LikeGroup.MEMBER };
             targetMember.meLiked = await this.likeService.checkLikeExistence(likeInput);
             // meFollowed
+            targetMember.meFollowed = await this.checkSubscription(memberId, targetId);
         }
 
         return targetMember;
+    }
+
+    private async checkSubscription(followerId: ObjectId, followingId: ObjectId): Promise<MeFollowed[]> {
+        const result: Follower | null = await this.followModel.findOne({ followingId: followingId, followerId: followerId }).exec();
+        return result ? [{ followerId: followerId, followingId: followingId, myFollowing: true }] : [];
     }
 
     // DEFINE 
