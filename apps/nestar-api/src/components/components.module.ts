@@ -9,6 +9,6 @@ import { LikeModule } from './like/like.module';
 import { AuthModule } from './auth/auth/auth.module';
 
 @Module({
-  imports: [MemberModule, PropertyModule, CommentModule, ViewModule, FollowModule, BoardArticleModule, LikeModule, AuthModule],
+  imports: [MemberModule, AuthModule, PropertyModule, BoardArticleModule, LikeModule, ViewModule, CommentModule, FollowModule],
 })
 export class ComponentsModule {}
