@@ -11,7 +11,7 @@ import { BoardArticleStatus } from '../../libs/types/enums/board-article.enum';
 import { ViewGroup } from '../../libs/types/enums/view.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { BoardArticleUpdate } from '../../libs/types/dto/board-article/board-article.update';
-import { lookupMember, shapeIntoMongoObjectId } from '../../libs/types/config';
+import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../../libs/types/config';
 import { LikeService } from '../like/like.service';
 import { LikeGroup } from '../../libs/types/enums/like.enum';
 import { LikeInput } from '../../libs/types/dto/like/like.input';
@@ -129,6 +129,7 @@ export class BoardArticleService {
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },
 							// meLiked
+							lookupAuthMemberLiked(memberId),
 							lookupMember,
 							{ $unwind: '$memberData' },
 						],

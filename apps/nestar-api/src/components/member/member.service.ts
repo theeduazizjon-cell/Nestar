@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { AgentsInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/types/dto/member/member.input';
 import { Member, Members } from '../../libs/types/dto/member/member';
 import { Follower, Following, MeFollowed } from '../../libs/types/dto/follow/follow';
+import { lookupAuthMemberLiked } from '../../libs/types/config';
 import { MemberStatus, MemberType } from '../../libs/types/enums/member.enum';
 import { Message } from '../../libs/types/enums/common.enum';
 import { AuthService } from '../auth/auth/auth.service';
@@ -133,7 +134,10 @@ export class MemberService {
                 { $sort: sort },
                 {
                     $facet: {
-                        list: [{ $skip: (input.page! - 1) * input.limit! }, { $limit: input.limit! }],
+                        list: [{ $skip: (input.page! - 1) * input.limit! }, { $limit: input.limit! },
+                            lookupAuthMemberLiked(memberId),
+
+                        ],
                         metaCounter: [{ $count: 'total' }],
                     },
                 },
