@@ -7,6 +7,7 @@ import {
     AllPropertiesInquiry,
     PropertiesInquiry,
     PropertyInput,
+    OrdinaryInquiry,
 } from '../../libs/types/dto/property/property.input';
 import { Direction, Message } from '../../libs/types/enums/common.enum';
 import { MemberService } from '../member/member.service';
@@ -141,6 +142,10 @@ export class PropertyService {
         if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
         return result[0];
+    }
+
+    public async getFavorites(memberId: ObjectId, input: OrdinaryInquiry): Promise<Properties> {
+        return await this.likeService.getFavoriteProperties(memberId, input);
     }
 
     private shapeMatchQuery(match: T, input: PropertiesInquiry): void {

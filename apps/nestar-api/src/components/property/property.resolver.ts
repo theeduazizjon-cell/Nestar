@@ -6,6 +6,7 @@ import {
     PropertiesInquiry,
     AgentPropertiesInquiry,
     AllPropertiesInquiry,
+    OrdinaryInquiry,
 } from '../../libs/types/dto/property/property.input';
 import { MemberType } from '../../libs/types/enums/member.enum';
 import { Roles } from '../auth/auth/decorators/roles.decorator';
@@ -65,6 +66,16 @@ export class PropertyResolver {
     ): Promise<Properties> {
         console.log('Query: getProperties');
         return await this.propertyService.getProperties(memberId, input);
+    }
+
+    @UseGuards(AuthGuard)
+    @Query((returns) => Properties)
+    public async getFavorites(
+        @Args('input') input: OrdinaryInquiry,
+        @AuthMember('_id') memberId: mongoose.ObjectId,
+    ): Promise<Properties> {
+        console.log('Query: getFavorites');
+        return await this.propertyService.getFavorites(memberId, input);
     }
 
     @Roles(MemberType.AGENT)
