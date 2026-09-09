@@ -71,14 +71,14 @@ export class FollowService {
 
 		const result = await this.followModel
 		.aggregate([
-			{ $match: match },
+			{ $match: match }, // followerId agentimiz bulib uni va uni oldidagi followingId larni olib oladi
 			{ $sort: { createdAt: Direction.DESC } },
 			{
 				$facet: {
 					list: [
 						{ $skip: (page - 1) * limit },
 						{ $limit: limit },
-                            lookupAuthMemberLiked(memberId, '$followingId'),
+                            lookupAuthMemberLiked(memberId, '$followingId'), // followingId bu Agent follow qilgan users
 
                             lookupAuthMemberFollowed({ followerId: memberId, followingId: '$followingId' }),
 						lookupFollowingData,
@@ -97,20 +97,20 @@ export class FollowService {
 	public async getMemberFollowers(memberId: ObjectId, input: FollowInquiry): Promise<Followers> {
 		const { page, limit, search } = input;
 		if (!search?.followingId) throw new InternalServerErrorException(Message.BAD_REQUEST);
-		const match: T = { followingId: search?.followingId };
+		const match: T = { followingId: search?.followingId }; // followingId ni egasiga kimlar follow qilgan busa topib ularni followerId qilib chiqaradi
 		console.log('match:', match);
 
 		const result = await this.followModel
 		.aggregate([
-			{ $match: match },
+			{ $match: match }, // bu yerda followingI tepadagi agent va uning followerId si paydo buldi
 			{ $sort: { createdAt: Direction.DESC } },
 			{
 				$facet: {
 					list: [
 						{ $skip: (page - 1) * limit },
 						{ $limit: limit },
-						lookupAuthMemberLiked(memberId, '$followerId'),
-						lookupAuthMemberFollowed({ followerId: memberId, followingId: '$followerId' }),
+						lookupAuthMemberLiked(memberId, '$followerId'), // men bu odamlarga like bosganmanmi
+						lookupAuthMemberFollowed({ followerId: memberId, followingId: '$followerId' }), // men bu odamlarga follow qilganmanmi
 						lookupFollowerData,
 						{ $unwind: '$followerData' },
 					],
