@@ -13,7 +13,7 @@ export class BatchService {
     @InjectModel('Member') private readonly memberModel: Model<Member>,
   ) {}
 
-  public async bacthRollback(): Promise<void> {
+  public async batchRollback(): Promise<void> {
     await this.propertyModel
       .updateMany(
         {
@@ -47,7 +47,7 @@ export class BatchService {
     const promisedList = properties.map(async (ele: Property) => {
       const { _id, propertyLikes, propertyViews } = ele;
       const rank = propertyLikes * 2 + propertyViews * 1;
-      return await this.propertyModel.findByIdAndUpdate(_id, { propertyRank: rank });
+      return await this.propertyModel.findByIdAndUpdate(_id, { propertyRank: rank }).exec();
     });
 
     await Promise.all(promisedList);

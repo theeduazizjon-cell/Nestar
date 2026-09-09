@@ -5,7 +5,7 @@ import { BATCH_ROLLBACK, BATCH_TOP_AGENTS, BATCH_TOP_PROPERTIES } from './libs/c
 
 @Controller()
 export class BatchController {
-  private logger: Logger = new Logger('SocketEventsGateways');
+  private logger: Logger = new Logger('BatchController.name');
 
   constructor(private readonly batchService: BatchService) {}
 
@@ -22,17 +22,17 @@ export class BatchController {
   }
 
   @Cron('00 00 01 * * *', { name: BATCH_ROLLBACK })
-  public async bacthRollback() {
+  public async batchRollback() {
     try {
       this.logger['context'] = 'BATCH_ROLLBACK';
       this.logger.debug('EXECUTED');
-      await this.batchService.bacthRollback();
+      await this.batchService.batchRollback();
     } catch (err) {
       this.logger.error(err);
     }
   }
 
-  @Cron('20 00 01* * *', { name: BATCH_TOP_PROPERTIES })
+  @Cron('20 00 01 * * *', { name: BATCH_TOP_PROPERTIES })
   public async batchTopProperties() {
     try {
       this.logger['context'] = 'BATCH_TOP_PROPERTIES';
@@ -43,7 +43,7 @@ export class BatchController {
     }
   }
 
-  @Cron('40 00 01* * *', { name: BATCH_TOP_AGENTS })
+  @Cron('40 00 01 * * *', { name: BATCH_TOP_AGENTS })
   public async batchTopAgents() {
     try {
       this.logger['context'] = 'BATCH_TOP_AGENTS';
@@ -58,4 +58,17 @@ export class BatchController {
   getHello(): string {
     return this.batchService.getHello();
   }
+
+  /** Hammasini bittada yozish xatolikni oldini olish uchun!
+   @Cron('00 00 01 * * *', { name: BATCH_NIGHTLY_JOB })
+  public async runNightlyBatch() {
+    try {
+      await this.batchService.batchRollback();
+      await this.batchService.batchProperties();
+      await this.batchService.batchAgents();
+    } catch (err) {
+      this.logger.error(err);
+    }
+  }
+   */
 }
