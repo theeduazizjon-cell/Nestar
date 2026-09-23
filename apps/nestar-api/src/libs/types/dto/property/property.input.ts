@@ -85,6 +85,7 @@ export class SquaresRange {
 
     @Field(() => Int)
     end!: number;
+    length: SquaresRange;
 }
 
 @InputType()
